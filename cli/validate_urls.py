@@ -1,3 +1,5 @@
+import re
+
 def url_validator(urls = []):
     """Validate URL"""
 

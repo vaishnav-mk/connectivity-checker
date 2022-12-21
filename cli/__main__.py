@@ -2,10 +2,8 @@
 
 import asyncio
 import sys
-import re
 
-from conn_checker import cli_handler, conn_checker, file_handler
-from conn_checker import url_validator
+from cli import cli_handler, file_handler, validate_urls, conn_checker
 
 def main():
     """The core of the application"""
@@ -24,7 +22,7 @@ def main():
         urls = [args.url]
 
     # validate urls
-    urls = url_validator(urls)
+    urls = validate_urls.url_validator(urls)
 
     if not urls:
         print("Exiting: No URLs to check")
