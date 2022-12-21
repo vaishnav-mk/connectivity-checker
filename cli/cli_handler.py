@@ -55,6 +55,15 @@ def handle_cli():
         nargs="+",
     )
     parser.add_argument(
+        "-s",
+        "--status",
+        metavar="status",
+        help="Only display the results with the provided status code(s)",
+        default=[],
+        type=int,
+        nargs="+",
+    )
+    parser.add_argument(
         "-u",
         "--url",
         metavar="url",

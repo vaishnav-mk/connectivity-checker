@@ -56,7 +56,6 @@ def display_results(results, args):
     success = []
     failure = []
 
-    print(f"Results ({len(results)}):")
     print("--------------------")
 
     for result in results:
@@ -65,6 +64,14 @@ def display_results(results, args):
         else:
             failure.append(result)
     
+    if args.status:
+        print(f"Filtering results by status: {args.status}")
+        results = list(filter(lambda x: x["result"]["status"] in args.status, results))
+        print("--------------------")
+
+    print(f"Results ({len(results)}):")
+    print("--------------------")
+
     if args.success:
         if not success:
             print(f"No successful connections found for {len(results)} URLs")

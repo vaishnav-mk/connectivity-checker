@@ -18,7 +18,7 @@ $ cd connectivity-checker
 ## Usage
 
 ```bash
-$ connectivity-checker --help
+$ python -m cli --help
 
   Usage: connectivity-checker [options]
 
@@ -30,18 +30,20 @@ $ connectivity-checker --help
     -h, --help             output usage information
     -u, --url <url>        The URL to check
     -v, --verbose          output the result of the check in verbose mode (default: false)
+    -s, --status           only display the results with the provided status codes
 ```
 
 ## Examples
 
 ```bash
-$ connectivity-checker -f urls.txt more-urls.txt
-$ connectivity-checker -u https://google.com -t 5 5 5 7
-$ connectivity-checker -m https://google.com,https://github.com
-$ connectivity-checker -u https://google.com -v
+$ python -m cli -f urls.txt more-urls.txt
+$ python -m cli -u https://google.com -t 5 5 5 7
+$ python -m cli -m https://google.com,https://github.com
+$ python -m cli -u https://google.com -v
+$ python -m cli -u https://google.com -s 200 404
 ```
 
-## Endpoints
+## API
 * API Info:
 * * API package used: [FastAPI](https://fastapi.tiangolo.com/)
 * * Documentation: [Swagger](https://swagger.io/)
