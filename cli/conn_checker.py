@@ -15,9 +15,8 @@ class PingURL:
 
     def build_result(self, response, start_time, end_time):
         return {
-            "url": self.url,
             "status": response.status if response else None,
-            "success": response.status == 200,
+            "success": response.status == 200 if response else False,
             "reason": response.reason if response else None,
             "time": {
                 "seconds": (end_time - start_time).total_seconds(),
@@ -46,8 +45,8 @@ class PingURL:
                 connection = HTTPConnection(self.host, port, timeout=self.timeout)
                 connection.request("HEAD", "/")
                 response = connection.getresponse()
-                return self.build_result(response, start_time, datetime.now())
                 connection.close()
+                return self.build_result(response, start_time, datetime.now())
             except Exception as e:
                 res = self.build_result(None, start_time, datetime.now())
                 res["reason"] = str(e)

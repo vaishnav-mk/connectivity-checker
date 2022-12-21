@@ -30,7 +30,7 @@ class DisplayResults:
             if not success:
                 print(f"No successful connections found for {len(self.results)} URLs")
             for result in success:
-                self.verbose_results() if self.verbose else print(
+                return self.verbose_results(success) if self.verbose else print(
                     f"Success: {result['url']}"
                 )
         else:
@@ -46,17 +46,14 @@ class DisplayResults:
                         )
                     )
 
-    def verbose_results(self):
-        for index, result in enumerate(self.results):
-            print(f"[{index+1}] URL: {result['url']}")
-            print(f"Success: {result['result']['success']}")
+    def verbose_results(self, results=None):
+        results = self.results if not results else results
+        for index, result in enumerate(results):
+            print(f"[{index+1}] URL: {result.pop('url')}")
+            print(f"Success: {result['result'].pop('success')}")
             for key, value in result["result"].items():
-                if ["success", "url"].count(key) > 0:
-                    continue
-                elif key == "error":
-                    print(f"Error: {value}")
-                elif key == "time":
+                if key == "time":
                     print("Time taken: {0:.2f} seconds".format(value["seconds"]))
                 else:
-                    print(f"{key}: {value}")
+                    print(f"{key.title()}: {value}")
             self.divider()

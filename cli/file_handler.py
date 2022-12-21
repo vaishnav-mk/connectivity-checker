@@ -11,6 +11,7 @@ def read_files(files):
         sys.exit(1)
     return urls
 
+
 def read_file(file):
     file_path = pathlib.Path(file)
     if file_path.exists():

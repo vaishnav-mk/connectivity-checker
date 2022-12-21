@@ -21,10 +21,8 @@ def main():
     elif args.url:
         urls = [args.url]
 
-    # validate urls
-    urls = validate_urls.url_validator(urls)
-    # remove duplicates
-    urls = list(dict.fromkeys(urls))
+    # validate urls and remove duplicates
+    urls = list(dict.fromkeys(validate_urls.url_validator(urls)))
 
     if not urls:
         print("Exiting: No URLs to check")
