@@ -2,7 +2,6 @@
 
 import argparse
 
-
 def handle_cli():
     parser = argparse.ArgumentParser(
         prog="connectivity-checker",
@@ -25,12 +24,19 @@ def handle_cli():
         action="store_true",
     )
     parser.add_argument(
+        "-su",
+        "--success",
+        help="Display only successful connections",
+        action="store_true",
+    )
+    parser.add_argument(
         "-f",
-        "--file",
-        metavar="file",
-        help="Check connectivity of websites from a file",
+        "--files",
+        metavar="files",
+        help="Check connectivity of websites from one or more files",
         type=str,
-        default="",
+        default=[],
+        nargs="+",
     )
     parser.add_argument(
         "-t",
@@ -38,14 +44,16 @@ def handle_cli():
         metavar="timeout",
         help="Set timeout for connection",
         type=int,
-        default=5,
+        default=[5],
+        nargs="+",
     )
+    parser.add_argument(
+        "-u",
+        "--url",
+        metavar="url",
+        help="Check connectivity of a single website",
+        type=str,
+        default="",
+    )
+
     return parser.parse_args()
-
-
-def main():
-    args = handle_cli()
-    print(args)
-
-
-main()

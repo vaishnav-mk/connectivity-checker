@@ -1,49 +1,95 @@
 """"Entry point for the application script"""
 
 import asyncio
-import pathlib
 import sys
+import re
 
 from conn_checker import cli_handler, conn_checker, file_handler
 
+def url_validator(urls = []):
+    """Validate URL"""
+
+
+    valid_urls = []
+    
+    regex = re.compile(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))")
+    
+    for url in urls:
+        if regex.match(url):
+            valid_urls.append(url)
+        else:
+            print(f"Invalid URL: {url}")
+    return valid_urls
 
 def main():
-    """ "The core of the application"""
-    args = cli_handler.handle_cli()
-    print(args)
+    """The core of the application"""
 
-    if args.file:
-        urls = file_handler.read_file(args.file)
+
+    args = cli_handler.handle_cli()
+    urls = []
+    results = []
+
+    # get urls from file or from cli
+    if args.files:
+        urls = file_handler.read_files(args.files)
     elif args.multi:
         urls = args.multi
-    else:
-        urls = [input("Enter a URL: ")]
+    elif args.url:
+        urls = [args.url]
 
+    # validate urls
+    urls = url_validator(urls)
+
+    if not urls:
+        print("Exiting: No URLs to check")
+        sys.exit(1)
+
+    # timeout for each url (in seconds) - default is 5 seconds per url 
+    timeout = args.timeout * len(urls)
+
+    # check connectivity
     if args.asynchronous:
-        for url in urls:
+        for index, url in enumerate(urls):
             try:
-                result = asyncio.run(conn_checker.ping_url(url, args.timeout))
-                display_results(result, url)
+                result = asyncio.run(conn_checker.ping_url(url, timeout[index]))
+                results.append({"url": url, "result": result})
             except Exception as e:
-                display_results(None, url, error=e)
+                results.append({"url": url, "result": None, "error": e})
     else:
-        for url in urls:
+        for index, url in enumerate(urls):
             try:
-                result = conn_checker.ping_url_sync(url, args.timeout)
-                print(result)
-                display_results(result, url)
+                result = conn_checker.ping_url_sync(url, timeout[index])
+                results.append({"url": url, "result": result})
             except Exception as e:
-                display_results(None, url, error=e)
+                results.append({"url": url, "result": None, "error": e})
+    
+    display_results(results, args)
 
-
-def display_results(result, url, error=None):
+def display_results(results, args):
     """Display results of the connectivity check"""
-    print(f"The status of {url} is", end=" ")
-    if result:
-        print(result)
-    else:
-        print(f"Error: {error}")
 
+
+    success = []
+    failure = []
+
+    print(f"Results ({len(results)}):")
+
+    for result in results:
+        if result["result"]["success"]:
+            success.append(result)
+        else:
+            failure.append(result)
+    
+    if args.success:
+        if not success:
+            print(f"No successful connections found for {len(results)} URLs")
+        for result in success:
+            print(result["url"])
+    else:
+        for result in success:
+            print(f"Success: {result['url']}")
+        for result in failure:
+            print(f"Failure: {result['url']} - {result['result']['reason']}")
 
 if __name__ == "__main__":
     main()

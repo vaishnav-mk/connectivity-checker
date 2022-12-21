@@ -1,5 +1,4 @@
 import asyncio
-import pprint
 import aiohttp
 
 from http.client import HTTPConnection
@@ -49,6 +48,7 @@ async def ping_url(url, timeout=5):
 
 
 def ping_url_sync(url, timeout=5):
+    print("ping_url_sync", url, timeout)
     """This function pings a URL and returns True if it is reachable"""
     error = Exception("Unknown error")
     parsed_url = urlparse(url)
