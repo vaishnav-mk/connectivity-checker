@@ -3,7 +3,7 @@
 import asyncio
 import sys
 
-from cli import cli_handler, file_handler, validate_urls, conn_checker
+from cli import cli_handler, file_handler, validate_urls, conn_checker, result_handler
 
 def main():
     """The core of the application"""
@@ -23,6 +23,8 @@ def main():
 
     # validate urls
     urls = validate_urls.url_validator(urls)
+    # remove duplicates
+    urls = list(dict.fromkeys(urls))
 
     if not urls:
         print("Exiting: No URLs to check")
@@ -32,74 +34,21 @@ def main():
     timeout = args.timeout * len(urls)
 
     # check connectivity
-    if args.asynchronous:
-        for index, url in enumerate(urls):
-            try:
-                result = asyncio.run(conn_checker.ping_url(url, timeout[index]))
+    for index, url in enumerate(urls):
+        pinger = conn_checker.PingURL(url, timeout[index])
+        try:
+            if args.asynchronous:
+                result = asyncio.run(pinger.ping_async())
                 results.append({"url": url, "result": result})
-            except Exception as e:
-                results.append({"url": url, "result": None, "error": e})
-    else:
-        for index, url in enumerate(urls):
-            try:
-                result = conn_checker.ping_url_sync(url, timeout[index])
-                results.append({"url": url, "result": result})
-            except Exception as e:
-                results.append({"url": url, "result": None, "error": e})
-    
-    display_results(results, args)
-
-def display_results(results, args):
-    """Display results of the connectivity check"""
-
-    verbose = args.verbose
-    success = []
-    failure = []
-
-    print("--------------------")
-
-    for result in results:
-        if result["result"]["success"]:
-            success.append(result)
-        else:
-            failure.append(result)
-    
-    if args.status:
-        print(f"Filtering results by status: {args.status}")
-        results = list(filter(lambda x: x["result"]["status"] in args.status, results))
-        print("--------------------")
-
-    print(f"Results ({len(results)}):")
-    print("--------------------")
-
-    if args.success:
-        if not success:
-            print(f"No successful connections found for {len(results)} URLs")
-        for result in success:
-            verbose_results(results) if verbose else print(f"Success: {result['url']}")
-    else:
-        if verbose:
-            verbose_results(results)
-        else:
-            for index, result in enumerate(results):
-                print("[{}] {}: {}".format(index+1, "success" if success else "No", result['url']))
-            
-
-
-def verbose_results(results):
-    for index, result in enumerate(results):
-        print(f"[{index+1}] URL: {result['url']}")
-        print(f"Success: {result['result']['success']}")
-        for key, value in result["result"].items():
-            if ["success", "url"].count(key) > 0:
-                continue
-            elif key == "error":
-                print(f"Error: {value}")
-            elif key == "time":
-                print("Time taken: {0:.2f} seconds".format(value["seconds"]))
             else:
-                print(f"{key}: {value}")
-        print("--------------------")
+                result = pinger.ping_sync()
+                results.append({"url": url, "result": result})
+        except Exception as e:
+            results.append({"url": url, "result": None, "error": e})
+
+    # display results
+    result_display = result_handler.DisplayResults(results, args)
+    result_display.display_results()
 
 if __name__ == "__main__":
     main()

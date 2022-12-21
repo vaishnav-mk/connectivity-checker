@@ -1,92 +1,54 @@
-import asyncio
 import aiohttp
+import asyncio
 
 from http.client import HTTPConnection
 from urllib.parse import urlparse
 from datetime import datetime
 
 
-async def ping_url(url, timeout=5):
-    """This function pings a URL and returns True if it is reachable"""
-    error = Exception("Unknown error")
-    parsed_url = urlparse(url)
-    host = parsed_url.netloc or parsed_url.path.split("/")[0]
-    res = {
-        "success": False,
-        "reason": None,
-    }
-    for scheme in ["http", "https"]:
-        target = f"{scheme}://{host}"
-        try:
-            async with aiohttp.ClientSession() as session:
-                start_time = datetime.now()
-                async with session.head(target, timeout=timeout) as response:
-                    end_time = datetime.now()
-                    res = {
-                        "url": url,
-                        "status": response.status,
-                        "success": response.status == 200,
-                        "reason": response.reason,
-                        "time": {
-                            "seconds": (end_time - start_time).total_seconds(),
-                            "start_time": start_time.strftime("%H:%M:%S.%f"),
-                            "end_time": end_time.strftime("%H:%M:%S.%f"),
-                        },
-                    }
-        except asyncio.TimeoutError:
-            res["reason"] = "Timeout error"
-            error = Exception("Timeout error")
-        except Exception as e:
-            if "getaddrinfo failed" in str(e):
-                res["reason"] = "DNS resolution error"
-                error = Exception("DNS resolution error")
-            res["reason"] = str(e)
-            error = e
-        finally:
-            return res
-    raise error
+class PingURL:
+    def __init__(self, url, timeout=5):
+        self.url = url
+        self.timeout = timeout
+        self.parsed_url = urlparse(url)
+        self.host = self.parsed_url.netloc or self.parsed_url.path.split("/")[0]
 
+    def build_result(self, response, start_time, end_time):
+        return {
+            "url": self.url,
+            "status": response.status if response else None,
+            "success": response.status == 200,
+            "reason": response.reason if response else None,
+            "time": {
+                "seconds": (end_time - start_time).total_seconds(),
+                "start_time": start_time.strftime("%H:%M:%S.%f"),
+                "end_time": end_time.strftime("%H:%M:%S.%f"),
+            },
+        }
 
-def ping_url_sync(url, timeout=5):
-    """This function pings a URL and returns True if it is reachable"""
-    error = Exception("Unknown error")
-    parsed_url = urlparse(url)
-    host = parsed_url.netloc or parsed_url.path.split("/")[0]
-    res = {
-        "success": False,
-        "reason": None,
-    }
-    for port in [80, 443]:
-        try:
-            start_time = datetime.now()
-            connection = HTTPConnection(host, port, timeout=timeout)
-            connection.request("HEAD", "/")
-            response = connection.getresponse()
-            end_time = datetime.now()
-            res = {
-                "url": url,
-                "status": response.status,
-                "success": response.status == 200,
-                "reason": response.reason,
-                "time": {
-                    "seconds": (end_time - start_time).total_seconds(),
-                    "microseconds": (end_time - start_time).total_seconds() * 1000000,
-                    "start_time": start_time.strftime("%H:%M:%S.%f"),
-                    "end_time": end_time.strftime("%H:%M:%S.%f"),
-                },
-            }
-            connection.close()
+    async def ping_async(self):
+        start_time = datetime.now()
+        for scheme in ["http", "https"]:
+            target = f"{scheme}://{self.host}"
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.head(target, timeout=self.timeout) as response:
+                        return self.build_result(response, start_time, datetime.now())
+            except Exception as e:
+                res = self.build_result(None, start_time, datetime.now())
+                res["reason"] = str(e)
+        return res
 
-        except Exception as e:
-            if "getaddrinfo failed" in str(e):
-                res["reason"] = "Invalid URL"
-                error = Exception("Invalid URL")
-            elif "timed out" in str(e):
-                res["reason"] = "Timeout error"
-                error = Exception("Timeout error")
-            else:
-                res["reason"] = "Unknown error"
-                error = e
-        finally:
-            return res
-    raise error
+    def ping_sync(self):
+        start_time = datetime.now()
+        for port in [80, 443]:
+            try:
+                connection = HTTPConnection(self.host, port, timeout=self.timeout)
+                connection.request("HEAD", "/")
+                response = connection.getresponse()
+                return self.build_result(response, start_time, datetime.now())
+                connection.close()
+            except Exception as e:
+                res = self.build_result(None, start_time, datetime.now())
+                res["reason"] = str(e)
+        return res
