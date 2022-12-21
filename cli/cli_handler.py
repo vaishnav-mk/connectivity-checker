@@ -4,9 +4,9 @@ import argparse
 
 def handle_cli():
     parser = argparse.ArgumentParser(
-        prog="connectivity-checker",
-        description="Tool to check connectivity of websites",
-        epilog="This tool is used to check connectivity of websites",
+        prog="Website pinger",
+        description="Tool to check the status of websites",
+        epilog="Example: python -m cli -u https://www.google.com -v -s 200 404",
     )
     parser.add_argument(
         "-m",

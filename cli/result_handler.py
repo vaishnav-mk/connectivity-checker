@@ -41,7 +41,7 @@ class DisplayResults:
                     print(
                         "[{}] {}: {}".format(
                             index + 1,
-                            "Success" if success else "Failure",
+                            "Success" if result["result"]["success"] else "Failure",
                             result["url"],
                         )
                     )
