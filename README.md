@@ -4,7 +4,7 @@
 ## TODO
 * [x] Add support for multiple files
 * [x] Add support for multiple timeouts
-* [ ] Add flag for verbose output
+* [x] Add flag for verbose output
 * [x] Add flag for single URL
 * [ ] Add API support
 
@@ -25,9 +25,11 @@ $ connectivity-checker --help
   Options:
 
     -m, --multi <url>      Multiple URLs to check (separated by a comma)
-    -f, --file <file>      The file containing the URLs to check
-    -t, --timeout <time>   The timeout in milliseconds (default: 5000)
+    -f, --file <file>      The files containing the URLs to check
+    -t, --timeout <time>   The timeouts in milliseconds (default: [5000])
     -h, --help             output usage information
+    -u, --url <url>        The URL to check
+    -v, --verbose          output the result of the check in verbose mode (default: false)
 ```
 
 ## Examples

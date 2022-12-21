@@ -30,6 +30,13 @@ def handle_cli():
         action="store_true",
     )
     parser.add_argument(
+        "-v",
+        "--verbose",
+        help="Display more information about the connection results",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
         "-f",
         "--files",
         metavar="files",

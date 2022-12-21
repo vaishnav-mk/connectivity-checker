@@ -68,11 +68,12 @@ def main():
 def display_results(results, args):
     """Display results of the connectivity check"""
 
-
+    verbose = args.verbose
     success = []
     failure = []
 
     print(f"Results ({len(results)}):")
+    print("--------------------")
 
     for result in results:
         if result["result"]["success"]:
@@ -84,12 +85,30 @@ def display_results(results, args):
         if not success:
             print(f"No successful connections found for {len(results)} URLs")
         for result in success:
-            print(result["url"])
+            verbose_results(results) if verbose else print(f"Success: {result['url']}")
     else:
-        for result in success:
-            print(f"Success: {result['url']}")
-        for result in failure:
-            print(f"Failure: {result['url']} - {result['result']['reason']}")
+        if verbose:
+            verbose_results(results)
+        else:
+            for index, result in enumerate(results):
+                print("[{}] {}: {}".format(index+1, "success" if success else "No", result['url']))
+            
+
+
+def verbose_results(results):
+    for index, result in enumerate(results):
+        print(f"[{index+1}] URL: {result['url']}")
+        print(f"Success: {result['result']['success']}")
+        for key, value in result["result"].items():
+            if ["success", "url"].count(key) > 0:
+                continue
+            elif key == "error":
+                print(f"Error: {value}")
+            elif key == "time":
+                print("Time taken: {0:.2f} seconds".format(value["seconds"]))
+            else:
+                print(f"{key}: {value}")
+        print("--------------------")
 
 if __name__ == "__main__":
     main()

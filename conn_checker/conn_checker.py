@@ -48,7 +48,6 @@ async def ping_url(url, timeout=5):
 
 
 def ping_url_sync(url, timeout=5):
-    print("ping_url_sync", url, timeout)
     """This function pings a URL and returns True if it is reachable"""
     error = Exception("Unknown error")
     parsed_url = urlparse(url)
@@ -76,6 +75,7 @@ def ping_url_sync(url, timeout=5):
                     "end_time": end_time.strftime("%H:%M:%S.%f"),
                 },
             }
+            connection.close()
 
         except Exception as e:
             if "getaddrinfo failed" in str(e):
@@ -88,6 +88,5 @@ def ping_url_sync(url, timeout=5):
                 res["reason"] = "Unknown error"
                 error = e
         finally:
-            connection.close()
             return res
     raise error
