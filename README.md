@@ -1,6 +1,13 @@
 # connectivity-checker
 🔌 A simple CLI tool to check the connectivity of one or more sites!
 
+## TODO
+* [ ] Add support for multiple files
+* [ ] Add support for multiple timeouts
+* [ ] Add flag for verbose output
+* [ ] Add flag for single URL
+* [ ] Add API support
+
 ## Installation
 
 ```bash
