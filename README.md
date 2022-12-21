@@ -41,6 +41,7 @@ $ python -m cli -u https://google.com -t 5 5 5 7
 $ python -m cli -m https://google.com,https://github.com
 $ python -m cli -u https://google.com -v
 $ python -m cli -u https://google.com -s 200 404
+$ python -m cli -u https://google.com -su
 ```
 
 ## API
