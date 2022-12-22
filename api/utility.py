@@ -14,7 +14,7 @@ async def check_urls(urls, timeout: list):
     results = []
     async with aiohttp.ClientSession() as session:
         for url in urls:
-            await send_request(session, url, timeout[0])
+            results.append(await send_request(session, url, timeout[0]))
     return results
 
 
