@@ -30,8 +30,10 @@ class DisplayResults:
             if not success:
                 print(f"No successful connections found for {len(self.results)} URLs")
             for result in success:
-                return self.verbose_results(success) if self.verbose else print(
-                    f"Success: {result['url']}"
+                return (
+                    self.verbose_results(success)
+                    if self.verbose
+                    else print(f"Success: {result['url']}")
                 )
         else:
             if self.verbose:
