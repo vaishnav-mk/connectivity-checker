@@ -1,6 +1,7 @@
 import validators
 import aiohttp
 
+
 def validate_urls(urls):
     validated_urls = []
     for url in urls:
@@ -8,13 +9,14 @@ def validate_urls(urls):
             validated_urls.append(url)
     return validated_urls
 
-async def check_urls(urls, timeout):
+
+async def check_urls(urls, timeout: list):
     results = []
     async with aiohttp.ClientSession() as session:
         for url in urls:
-            await send_request(session, url, timeout)
+            await send_request(session, url, timeout[0])
     return results
-    
+
 
 async def send_request(session: aiohttp.ClientSession, url: str, timeout: int):
     try:

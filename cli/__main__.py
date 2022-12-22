@@ -5,9 +5,9 @@ import sys
 
 from cli import cli_handler, file_handler, validate_urls, conn_checker, result_handler
 
+
 def main():
     """The core of the application"""
-
 
     args = cli_handler.handle_cli()
     urls = []
@@ -28,7 +28,7 @@ def main():
         print("Exiting: No URLs to check")
         sys.exit(1)
 
-    # timeout for each url (in seconds) - default is 5 seconds per url 
+    # timeout for each url (in seconds) - default is 5 seconds per url
     timeout = args.timeout * len(urls)
 
     # check connectivity
@@ -47,6 +47,7 @@ def main():
     # display results
     result_display = result_handler.DisplayResults(results, args)
     result_display.display_results()
+
 
 if __name__ == "__main__":
     main()

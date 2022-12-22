@@ -2,6 +2,7 @@
 
 import argparse
 
+
 def handle_cli():
     parser = argparse.ArgumentParser(
         prog="Website pinger",
